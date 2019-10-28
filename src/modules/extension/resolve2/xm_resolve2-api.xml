@@ -1,0 +1,33 @@
+<declarations>
+ <module>xm_resolve2</module>
+ <include>../../../common/expr.h</include>
+ <include>../../../common/module.h</include>
+
+<!--
+TODO:
+  gid_to_name()
+  group_get_gid()
+  uid_to_name()
+  user_get_gid()
+  user_get_uid()
+  name_to_ipaddr()
+  file_unzip()
+-->
+ <function>
+   <name>ipaddr_to_name</name>
+   <type>global</type>
+   <cb>nx_expr_func__xm_resolve2_ipaddr_to_name</cb>
+   <rettype>string</rettype>
+   <arg>
+    <name>ipaddr</name>
+    <type>string</type>
+   </arg>
+   <description>
+     <en>
+Resolve and return the DNS name assigned to the IP address. The
+ipaddr argument can be either a string or an ip4addr type.
+     </en>
+   </description>
+ </function>
+
+</declarations>
