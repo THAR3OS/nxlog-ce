@@ -1,0 +1,174 @@
+#!/bin/sh
+# /etc/init.d/nxlog: start the nxlog daemon.
+
+### BEGIN INIT INFO
+# Provides:             nxlog
+# Required-Start:       $network $local_fs $remote_fs
+# Required-Stop:        $network $local_fs $remote_fs
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Description:          logging daemon
+# Short-Description:    logging daemon
+### END INIT INFO
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+pidfile=/var/run/nxlog/nxlog.pid
+nxlog=/usr/bin/nxlog
+
+test -f $nxlog || exit 5
+
+. /lib/lsb/init-functions
+
+RETVAL=0
+case "$1" in
+  start)
+    log_begin_msg "Starting nxlog daemon..."
+    if ! [ -d /var/run/nxlog ]; then
+	     mkdir /var/run/nxlog
+       chown nxlog:nxlog /var/run/nxlog
+       chmod 1770 /var/run/nxlog
+    fi
+    # get the status
+    $0 status >/dev/null
+    my_stat=$?
+    # if already running
+    if [ $my_stat -eq 0 ]; then
+        echo "nxlog is already running"
+        RETVAL=0
+        log_warning_msg
+    # try to start in all other cases
+    else
+        $nxlog
+        if [ $? -eq 0 ]; then
+           echo "nxlog started!"
+           RETVAL=0
+           log_end_msg 0
+        else
+           echo  "Failed to start nxlog!"
+           RETVAL=1
+           log_end_msg 1
+        fi
+    fi
+    ;;
+  stop)
+    log_begin_msg "Stopping nxlog daemon..."
+    # get the status
+    $0 status >/dev/null
+    my_stat=$?
+    # do nothing if not running
+    if [ $my_stat -eq 3 ]; then
+          echo "nxlog is not running"
+          RETVAL=7
+          log_warning_msg
+    # try to stop in any other cases
+    else
+          $nxlog -s
+          if [ $? -eq 0 ]; then
+              RETVAL=0
+              log_end_msg 0
+          else
+              echo "Failed to stop nxlog"
+              RETVAL=1
+              log_end_msg 1
+          fi
+    fi
+    ;;
+  reload)
+    log_begin_msg "Reloading nxlog daemon..."
+    # get the status
+    $0 status >/dev/null
+    my_stat=$?
+    # return 7 if not running
+    if [ $my_stat -eq 3 ]; then
+        echo "nxlog is not running"
+        RETVAL=7
+        log_end_msg 0
+    # in all other cases try to reload
+    else
+        $nxlog -r
+        if [ $? -eq 0 ]; then
+            echo "nxlog reloaded"
+            RETVAL=0
+            log_end_msg 0
+        else
+            echo "Failed to reload nxlog"
+            RETVAL=1
+            log_end_msg 1
+        fi
+    fi
+    ;;
+  status)
+    # if running fine
+    if [ -f $pidfile ] && ps $(<$pidfile) >/dev/null; then
+      log_begin_msg "nxlog is running"
+      RETVAL=0
+      log_end_msg 0
+    # if pidfile exists, but not running
+    elif [ -f $pidfile ]; then
+      log_begin_msg "nxlog not running but pidfile exist"
+      RETVAL=1
+      log_warning_msg
+    # running, but no pidfile, return value not defined
+  elif [ ! -f $pidfile ] && ps aux | grep -v grep | grep -q $nxlog; then
+      log_begin_msg "nxlog running, but no pidfile exists"
+      RETVAL=4
+      log_warning_msg
+    # not running, and no pidfile
+    else
+      log_begin_msg "nxlog not running"
+      RETVAL=3
+      log_end_msg 0
+    fi
+    ;;
+  restart|force-reload)
+    log_begin_msg "Restarting nxlog daemon..."
+    # get the current status
+    $0 status >/dev/null
+    my_stat=$?
+    # if not running
+    if [ $my_stat -eq 3 ]; then
+        $0 start
+        if [ $? -eq 0 ]; then
+            echo "nxlog restarted"
+            RETVAL=0
+            log_end_msg 0
+        else
+            echo "Failed to restart nxlog"
+            RETVAL=1
+            log_end_msg 1
+        fi
+    # if running, or unknown status
+    elif [ $my_stat -eq 0 ] || [ $my_stat -eq 4 ]; then
+        $0 stop || exit 1
+        $0 start
+        if [ $? -eq 0 ]; then
+            echo "nxlog restarted"
+            RETVAL=0
+            log_end_msg 0
+        else
+            echo "Failed to restart nxlog"
+            RETVAL=1
+            log_end_msg 1
+        fi
+    # if dead and pidfile exists
+    elif [ $my_stat -eq 1 ]; then
+      rm -rf $pidfile
+      $0 start
+      if [ $? -eq 0 ]; then
+          echo "nxlog restarted"
+          RETVAL=0
+          log_end_msg 0
+      else
+          echo "Failed to restart nxlog"
+          RETVAL=1
+          log_end_msg 1
+      fi
+    fi
+    ;;
+  *)
+    log_success_msg "Usage: /etc/init.d/nxlog {start|stop|restart|force-reload}"
+    exit 1
+esac
+
+exit $RETVAL

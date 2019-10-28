@@ -1,0 +1,4 @@
+perl:Depends=perl
+shlibs:Depends=libapr1 (>= 1.4.8-2~), libc6 (>= 2.14), libcap2 (>= 1:2.10), libdbi1 (>= 0.9.0), libexpat1 (>= 2.0.1), libpcre3, libperl5.26 (>= 5.26.0~rc1), libssl1.0.0 (>= 1.0.0), zlib1g (>= 1:1.1.4)
+misc:Depends=
+misc:Pre-Depends=
