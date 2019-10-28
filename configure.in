@@ -433,6 +433,7 @@ AC_OUTPUT(Makefile
 	        src/modules/extension/multiline/Makefile
 	        src/modules/extension/perl/Makefile
 			src/modules/extension/wtmp/Makefile
+      src/modules/extension/resolve2/Makefile
 	   src/utils/Makefile
 	)
 

@@ -106,7 +106,7 @@ void nx_expr_func__xm_resolve2_ipaddr_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSE
       break;
     case NX_VALUE_TYPE_IP4ADDR:
     case NX_VALUE_TYPE_IP6ADDR:
-      ipaddr = nx_value_to_string(&nx_value);
+      ipaddr = nx_value_to_string(&args[0]);
       break;
   }
 

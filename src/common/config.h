@@ -163,8 +163,7 @@
 /* Define to 1 if you have the <winevt.h> header file. */
 /* #undef HAVE_WINEVT_H */
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
 
 /* Name of package */
@@ -177,7 +176,7 @@
 #define PACKAGE_NAME "nxlog-ce"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "nxlog-ce 2.10.7"
+#define PACKAGE_STRING "nxlog-ce 2.10.4"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "nxlog-ce"
@@ -186,16 +185,16 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.10.7"
+#define PACKAGE_VERSION "2.10.4"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "2.10.7"
+#define VERSION "2.10.4"
 
 /* version string */
-#define VERSION_STRING "2.10.7"
+#define VERSION_STRING "2.10.4"
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
