@@ -322,7 +322,7 @@ top_build_prefix = ../../../
 top_builddir = ../../..
 top_srcdir = ../../..
 SUBDIRS = \
-                syslog exec csv charconv json xml gelf fileop multiline perl kvp wtmp
+                syslog exec csv charconv json xml gelf fileop multiline perl kvp wtmp resolve2
 
 all: all-recursive
 
