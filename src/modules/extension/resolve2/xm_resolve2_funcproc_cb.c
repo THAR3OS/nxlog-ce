@@ -138,7 +138,7 @@ void nx_expr_func__xm_resolve2_group_get_gid(nx_expr_eval_ctx_t *eval_ctx UNUSED
   {
     throw_msg("'%s' type argument is invalid. allowed type is '%s'.",
         nx_value_type_to_string(args[0].type),
-        nx_value_type_to_string(NX_VALUE_TYPE_STRING))
+        nx_value_type_to_string(NX_VALUE_TYPE_STRING));
   }
 
   retval->type = NX_VALUE_TYPE_INTEGER;
