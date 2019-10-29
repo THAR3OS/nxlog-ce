@@ -47,6 +47,22 @@ gid cannot be looked up, undef is returned.
  </function>
 
  <function>
+   <name>group_get_gid</name>
+   <type>global</type>
+   <cb>nx_expr_func__xm_resolve2_group_get_gid</cb>
+   <rettype>integer</rettype>
+   <arg>
+    <name>groupname</name>
+    <type>string</type>
+   </arg>
+   <description>
+     <en>
+Return the group ID assigned to the group name.
+     </en>
+   </description>
+ </function>
+
+ <function>
    <name>ipaddr_to_name</name>
    <type>global</type>
    <cb>nx_expr_func__xm_resolve2_ipaddr_to_name</cb>

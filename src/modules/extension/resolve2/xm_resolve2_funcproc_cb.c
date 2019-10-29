@@ -50,21 +50,18 @@ char *_get_hostname_by_addr(char *address)
 
   if ((error = getaddrinfo(address, NULL, &hints, &res)) != 0)
   {
-     throw_msg("getaddrinfo: '%s'",
-         nx_value_type_to_string(gai_strerror(error)));
+     throw_msg("getaddrinfo: '%s'", gai_strerror(error));
   } else {
     for (resorig = res; res != NULL; res = res->ai_next)
     {
       if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
               numhost, sizeof (numhost), NULL, 0, NI_NUMERICHOST)) != 0)
       {
-        throw_msg("getnameinfo: '%s'",
-            nx_value_type_to_string(gai_strerror(error)));
+        throw_msg("getnameinfo: '%s'", gai_strerror(error));
       } else if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
           host, sizeof (host), NULL, 0, 0)) != 0)
       {
-        throw_msg("getnameinfo: '%s'",
-            nx_value_type_to_string(gai_strerror(error)));
+        throw_msg("getnameinfo: '%s'", gai_strerror(error));
       } else {
         hostname = malloc(sizeof(host));
         strcpy(hostname,host);
@@ -83,7 +80,6 @@ void nx_expr_func__xm_resolve2_gid_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSED,
     nx_value_t *args)
 {
   gid_t gid;
-  char *grpname;
   struct group* g;
 
   ASSERT(retval != NULL);
@@ -108,19 +104,14 @@ void nx_expr_func__xm_resolve2_gid_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSED,
   switch (args[0].type)
   {
     case NX_VALUE_TYPE_STRING:
-      gid = atoi(args[0].string->buf);
+      gid = (gid_t)atoi(args[0].string->buf);
       break;
     case NX_VALUE_TYPE_INTEGER:
-      gid = atoi(nx_value_to_string(&args[0]));
+      gid = (gid_t)atoi(nx_value_to_string(&args[0]));
       break;
     default:
-      gid = -1;
-  }
-
-  if ( gid < 0 )
-  {
-    retval->defined = FALSE;
-    return;
+      retval->defined = FALSE;
+      return;
   }
   if( ( g = getgrgid( gid ) ) == NULL )
   {
@@ -128,6 +119,42 @@ void nx_expr_func__xm_resolve2_gid_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSED,
     return;
      }
   retval->string = nx_string_create(g->gr_name, -1);
+  retval->defined = TRUE;
+}
+
+void nx_expr_func__xm_resolve2_group_get_gid(nx_expr_eval_ctx_t *eval_ctx UNUSED,
+    nx_module_t *module UNUSED,
+    nx_value_t *retval,
+    int32_t num_arg,
+    nx_value_t *args)
+{
+  char *groupname;
+  struct group* g;
+
+  ASSERT(retval != NULL);
+  ASSERT(num_arg == 1);
+
+  if (args[0].type != NX_VALUE_TYPE_STRING)
+  {
+    throw_msg("'%s' type argument is invalid. allowed type is '%s'.",
+        nx_value_type_to_string(args[0].type),
+        nx_value_type_to_string(NX_VALUE_TYPE_STRING))
+  }
+
+  retval->type = NX_VALUE_TYPE_INTEGER;
+  if ( args[0].defined == FALSE )
+  {
+    retval->defined = FALSE;
+    return;
+  }
+
+  groupname = args[0].string->buf;
+  if( ( g = getgrnam( groupname ) ) == NULL )
+  {
+    retval->defined = FALSE;
+    return;
+     }
+  retval->integer = (int64_t)g->gr_gid;
   retval->defined = TRUE;
 }
 
