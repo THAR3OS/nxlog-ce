@@ -12,6 +12,7 @@
 
 #include "../../../common/module.h"
 #include "../../../core/nxlog.h"
+#include "xm_resolve2.h"
 
 #define NX_LOGMODULE NX_LOGMODULE_CORE
 

@@ -1,5 +1,7 @@
+noinst_LTLIBRARIES = libresolve2.la
 xm_resolve2_LTLIBRARIES		= xm_resolve2.la
-xm_resolve2_la_SOURCES		= xm_resolve2.c xm_resolve2_funcproc_cb.c $(xm_resolve2_la_BUILTSOURCES)
+xm_resolve2_la_SOURCES		= xm_resolve2.c xm_resolve2.h xm_resolve2_funcproc_cb.c $(xm_resolve2_la_BUILTSOURCES)
+libresolve2_la_SOURCES    = resolve2.c resolve2.h
 xm_resolve2_la_LDFLAGS		= -module -no-undefined -avoid-version
 xm_resolve2_la_LIBADD		= $(LIBNX)
 xm_resolve2dir			= $(NX_MODULEDIR)/extension
