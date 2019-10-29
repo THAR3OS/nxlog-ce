@@ -5,12 +5,9 @@
 
 <!--
 TODO:
-  group_get_gid()
   uid_to_name()
   user_get_gid()
   user_get_uid()
-  name_to_ipaddr()
-  file_unzip()
 -->
  <function>
    <name>gid_to_name</name>
@@ -75,6 +72,25 @@ Return the group ID assigned to the group name.
      <en>
 Resolve and return the DNS name assigned to the IP address. The
 ipaddr argument can be either a string or an ip4addr type.
+     </en>
+   </description>
+ </function>
+
+ <function>
+   <name>name_to_ipaddr</name>
+   <type>global</type>
+   <cb>nx_expr_func__xm_resolve2_name_to_ipaddr</cb>
+   <rettype>string</rettype>
+   <arg>
+    <name>name</name>
+    <type>string</type>
+   </arg>
+   <description>
+     <en>
+Resolve and return the first IPv4 or IPv6 address assigned to name.
+Here, xm_resolve2 differs from xm_resolver. Despite returing an
+ip4addr xm_resolve2 returns a string. Casting to ip4addr/ip6addr
+needs to be done in nxlog config language.
      </en>
    </description>
  </function>

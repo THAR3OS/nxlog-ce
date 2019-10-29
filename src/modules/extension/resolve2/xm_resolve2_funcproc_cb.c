@@ -73,6 +73,42 @@ char *_get_hostname_by_addr(char *address)
 	return hostname;
 }
 
+char *_get_ipaddr_by_addr(char *address)
+{
+	int error;
+	struct addrinfo *res, *resorig, hints;
+  struct sockaddr_in *addr;
+  struct *ipstring;
+  int endloop;
+
+	memset(&hints, 0, sizeof (hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+  ipstring = NULL;
+
+  if ((error = getaddrinfo(address, NULL, &hints, &res)) != 0)
+  {
+     throw_msg("getaddrinfo: '%s'", gai_strerror(error));
+  } else {
+    for (resorig = res; res != NULL; res = res->ai_next)
+    {
+      switch (res->ai_family) {
+        case AF_INET:
+        case AF_INET6:
+          addr = (struct sockaddr_in)res->ai_addr;
+          ipstring = inet_ntoa((struct in_addr)addr->sin_addr));
+          freeaddrinfo(resorig);
+          return ipstring;
+        default:
+          ipstring = NULL;
+          break;
+      }
+    }
+	  if (resorig) freeaddrinfo(resorig);
+  }
+	return ipstring;
+}
+
 void nx_expr_func__xm_resolve2_gid_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSED,
     nx_module_t *module UNUSED,
     nx_value_t *retval,
@@ -213,4 +249,46 @@ void nx_expr_func__xm_resolve2_ipaddr_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSE
     retval->string = nx_string_create(ipaddr, -1);
   }
   retval->defined = TRUE;
+}
+
+void nx_expr_func__xm_resolve2_name_to_ipaddr(nx_expr_eval_ctx_t *eval_ctx UNUSED,
+    nx_module_t *module UNUSED,
+    nx_value_t *retval,
+    int32_t num_arg,
+    nx_value_t *args)
+{
+  char *ipaddr;
+  char *hostname;
+
+  ASSERT(retval != NULL);
+  ASSERT(num_arg == 1);
+
+  if (args[0].type != NX_VALUE_TYPE_STRING)
+  {
+    throw_msg("'%s' type argument is invalid. allowed type is '%s'.",
+        nx_value_type_to_string(args[0].type),
+        nx_value_type_to_string(NX_VALUE_TYPE_STRING));
+  }
+
+  retval->type = NX_VALUE_TYPE_STRING;
+  if ( args[0].defined == FALSE )
+  {
+    retval->defined = FALSE;
+    return;
+  }
+
+  hostname = args[0].string->buf;
+
+  if ( hostname == NULL )
+  {
+    retval->defined = FALSE;
+    return;
+  }
+  if ((ipaddr = _get_ipaddr_by_addr(hostname)) != NULL)
+  {
+    retval->string = nx_string_create(ipaddr, -1);
+    retval->defined = TRUE;
+  } else {
+    retval->defined = FALSE;
+  }
 }
