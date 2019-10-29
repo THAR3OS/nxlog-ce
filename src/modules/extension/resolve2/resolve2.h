@@ -21,7 +21,7 @@ typedef struct nx_resolve2_ctx_t
 void nx_resolve2_ctx_init(nx_resolve2_ctx_t *ctx);
 char *ltrim(char *str, const char *seps);
 char *rtrim(char *str, const char *seps);
-char *trim(char *str, const char *seps):
+char *trim(char *str, const char *seps);
 int nx_resolve2_get_config_int(const char *str);
 
 #endif /* __NX_RESOLVE2_H */
