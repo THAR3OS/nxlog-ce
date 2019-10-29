@@ -128,17 +128,20 @@ am__uninstall_files_from_dir = { \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
 am__installdirs = "$(DESTDIR)$(xm_resolve2dir)"
-LTLIBRARIES = $(xm_resolve2_LTLIBRARIES)
+LTLIBRARIES = $(noinst_LTLIBRARIES) $(xm_resolve2_LTLIBRARIES)
+libresolve2_la_LIBADD =
+am_libresolve2_la_OBJECTS = resolve2.lo
+libresolve2_la_OBJECTS = $(am_libresolve2_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 am__DEPENDENCIES_1 =
 xm_resolve2_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_1 = expr-xm_resolve2-funcproc.lo
 am_xm_resolve2_la_OBJECTS = xm_resolve2.lo xm_resolve2_funcproc_cb.lo \
 	$(am__objects_1)
 xm_resolve2_la_OBJECTS = $(am_xm_resolve2_la_OBJECTS)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 xm_resolve2_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(xm_resolve2_la_LDFLAGS) $(LDFLAGS) -o \
@@ -177,8 +180,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(xm_resolve2_la_SOURCES)
-DIST_SOURCES = $(xm_resolve2_la_SOURCES)
+SOURCES = $(libresolve2_la_SOURCES) $(xm_resolve2_la_SOURCES)
+DIST_SOURCES = $(libresolve2_la_SOURCES) $(xm_resolve2_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -359,8 +362,10 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+noinst_LTLIBRARIES = libresolve2.la
 xm_resolve2_LTLIBRARIES = xm_resolve2.la
-xm_resolve2_la_SOURCES = xm_resolve2.c xm_resolve2_funcproc_cb.c $(xm_resolve2_la_BUILTSOURCES)
+xm_resolve2_la_SOURCES = xm_resolve2.c xm_resolve2.h xm_resolve2_funcproc_cb.c $(xm_resolve2_la_BUILTSOURCES)
+libresolve2_la_SOURCES = resolve2.c resolve2.h
 xm_resolve2_la_LDFLAGS = -module -no-undefined -avoid-version
 xm_resolve2_la_LIBADD = $(LIBNX)
 xm_resolve2dir = $(NX_MODULEDIR)/extension
@@ -400,6 +405,17 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; \
+	locs=`for p in $$list; do echo $$p; done | \
+	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
+	      sort -u`; \
+	test -z "$$locs" || { \
+	  echo rm -f $${locs}; \
+	  rm -f $${locs}; \
+	}
+
 install-xm_resolve2LTLIBRARIES: $(xm_resolve2_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	@list='$(xm_resolve2_LTLIBRARIES)'; test -n "$(xm_resolve2dir)" || list=; \
@@ -435,6 +451,9 @@ clean-xm_resolve2LTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
+libresolve2.la: $(libresolve2_la_OBJECTS) $(libresolve2_la_DEPENDENCIES) $(EXTRA_libresolve2_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK)  $(libresolve2_la_OBJECTS) $(libresolve2_la_LIBADD) $(LIBS)
+
 xm_resolve2.la: $(xm_resolve2_la_OBJECTS) $(xm_resolve2_la_DEPENDENCIES) $(EXTRA_xm_resolve2_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(xm_resolve2_la_LINK) -rpath $(xm_resolve2dir) $(xm_resolve2_la_OBJECTS) $(xm_resolve2_la_LIBADD) $(LIBS)
 
@@ -445,6 +464,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expr-xm_resolve2-funcproc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resolve2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xm_resolve2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xm_resolve2_funcproc_cb.Plo@am__quote@
 
@@ -598,8 +618,8 @@ maintainer-clean-generic:
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-xm_resolve2LTLIBRARIES \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
+	clean-xm_resolve2LTLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -670,8 +690,9 @@ uninstall-am: uninstall-xm_resolve2LTLIBRARIES
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-xm_resolve2LTLIBRARIES cscopelist-am ctags \
-	ctags-am distclean distclean-compile distclean-generic \
+	clean-libtool clean-noinstLTLIBRARIES \
+	clean-xm_resolve2LTLIBRARIES cscopelist-am ctags ctags-am \
+	distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
