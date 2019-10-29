@@ -6,6 +6,7 @@
  * Author: Stephan Seitz <s.seitz@mailbox.org>
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -33,7 +34,7 @@
  *  @returm
  *  a pointer to an char array, containg an fqdn. NULL on error.
  */
-char *get_hostname_by_addr(char *address)
+char *_get_hostname_by_addr(char *address)
 {
 	int error;
 	struct addrinfo *res, *resorig, hints;
@@ -47,21 +48,21 @@ char *get_hostname_by_addr(char *address)
 
   if ((error = getaddrinfo(address, NULL, &hints, &res)) != 0)
   {
-    printf("%s",
-        gai_strerror(error));
+     throw_msg("getaddrinfo: '%s'",
+         nx_value_type_to_string(gai_strerror(error)));
   } else {
     for (resorig = res; res != NULL; res = res->ai_next)
     {
       if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
               numhost, sizeof (numhost), NULL, 0, NI_NUMERICHOST)) != 0)
       {
-        printf("%s",
-            gai_strerror(error));
+        throw_msg("getnameinfo: '%s'",
+            nx_value_type_to_string(gai_strerror(error)));
       } else if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
           host, sizeof (host), NULL, 0, 0)) != 0)
       {
-        printf("%s",
-            gai_strerror(error));
+        throw_msg("getnameinfo: '%s'",
+            nx_value_type_to_string(gai_strerror(error)));
       } else {
         hostname = malloc(sizeof(host));
         strcpy(hostname,host);
@@ -71,6 +72,61 @@ char *get_hostname_by_addr(char *address)
 	  freeaddrinfo(resorig);
   }
 	return hostname;
+}
+
+void nx_expr_func__xm_resolve2_gid_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSED,
+    nx_module_t *module UNUSED,
+    nx_value_t *retval,
+    int32_t num_arg,
+    nx_value_t *args)
+{
+  gid_t gid;
+  char *grpname;
+  struct group* g;
+
+  ASSERT(retval != NULL);
+  ASSERT(num_arg == 1);
+
+  if ( (args[0].type != NX_VALUE_TYPE_STRING) &&
+      (args[0].type != NX_VALUE_TYPE_INTEGER) )
+  {
+    throw_msg("'%s' type argument is invalid. allowed types are '%s' and '%s'.",
+        nx_value_type_to_string(args[0].type),
+        nx_value_type_to_string(NX_VALUE_TYPE_STRING),
+        nx_value_type_to_string(NX_VALUE_TYPE_INTEGER));
+  }
+
+  retval->type = NX_VALUE_TYPE_STRING;
+  if ( args[0].defined == FALSE )
+  {
+    retval->defined = FALSE;
+    return;
+  }
+
+  switch (args[0].type)
+  {
+    case NX_VALUE_TYPE_STRING:
+      gid = atoi(args[0].string->buf);
+      break;
+    case NX_VALUE_TYPE_INTEGER:
+      gid = atoi(nx_value_to_string(&args[0]));
+      break;
+    default:
+      gid = -1;
+  }
+
+  if ( gid < 0 )
+  {
+    retval->defined = FALSE;
+    return;
+  }
+  if( ( g = getgrgid( gid ) ) == NULL )
+  {
+    retval->defined = FALSE;
+    return;
+     }
+  retval->string = nx_string_create(g->gr_name, -1);
+  retval->defined = TRUE;
 }
 
 void nx_expr_func__xm_resolve2_ipaddr_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSED,
@@ -121,7 +177,7 @@ void nx_expr_func__xm_resolve2_ipaddr_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSE
     retval->defined = FALSE;
     return;
   }
-  if ((hostname = get_hostname_by_addr(ipaddr)) != NULL)
+  if ((hostname = _get_hostname_by_addr(ipaddr)) != NULL)
   {
     retval->string = nx_string_create(hostname, -1);
   } else {

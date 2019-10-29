@@ -5,7 +5,6 @@
 
 <!--
 TODO:
-  gid_to_name()
   group_get_gid()
   uid_to_name()
   user_get_gid()
@@ -13,6 +12,40 @@ TODO:
   name_to_ipaddr()
   file_unzip()
 -->
+ <function>
+   <name>gid_to_name</name>
+   <type>global</type>
+   <cb>nx_expr_func__xm_resolve2_gid_to_name</cb>
+   <rettype>string</rettype>
+   <arg>
+    <name>gid</name>
+    <type>integer</type>
+   </arg>
+   <description>
+     <en>
+Return the group name assigned to the group ID. If gid cannot
+be looked up, undef is returned.
+     </en>
+   </description>
+ </function>
+
+ <function>
+   <name>gid_to_name</name>
+   <type>global</type>
+   <cb>nx_expr_func__xm_resolve2_gid_to_name</cb>
+   <rettype>string</rettype>
+   <arg>
+    <name>gid</name>
+    <type>string</type>
+   </arg>
+   <description>
+     <en>
+Return the group name assigned to the string gid on Unix. If
+gid cannot be looked up, undef is returned.
+     </en>
+   </description>
+ </function>
+
  <function>
    <name>ipaddr_to_name</name>
    <type>global</type>
