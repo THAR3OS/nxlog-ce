@@ -1,4 +1,4 @@
-/* Automatically generated from xm_resolve2_-api.xml by codegen.pl */
+/* Automatically generated from xm_resolve2-api.xml by codegen.pl */
 #include "expr-xm_resolve2-funcproc.h"
 
 
@@ -6,7 +6,7 @@
 
 // ipaddr_to_name
 const char *nx_expr_func__xm_resolve2_ipaddr_to_name_string_argnames[] = {
-    "address", 
+    "ipaddr", 
 };
 nx_value_type_t nx_expr_func__xm_resolve2_ipaddr_to_name_string_argtypes[] = {
     NX_VALUE_TYPE_STRING, 
@@ -26,13 +26,9 @@ nx_expr_func_t nx_api_declarations_xm_resolve2_funcs[] = {
  },
 };
 
-
-nx_expr_proc_t nx_api_declarations_xm_resolve2_procs[] = {
-};
-
 nx_module_exports_t nx_module_exports_xm_resolve2 = {
 	1,
 	nx_api_declarations_xm_resolve2_funcs,
 	0,
-	nx_api_declarations_xm_resolve2_procs,
+	NULL,
 };

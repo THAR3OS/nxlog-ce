@@ -5,13 +5,12 @@
 #include "../../../common/expr.h"
 #include "../../../common/module.h"
 
+
 /* FUNCTIONS */
 
 #define nx_api_declarations_xm_resolve2_func_num 1
 void nx_expr_func__xm_resolve2_ipaddr_to_name(nx_expr_eval_ctx_t *eval_ctx, nx_module_t *module, nx_value_t *retval, int32_t num_arg, nx_value_t *args);
-
-/* PROCEDURES */
-
 #define nx_api_declarations_xm_resolve2_proc_num 0
+
 
 #endif /* __NX_EXPR_FUNCPROC_xm_resolve2_H */

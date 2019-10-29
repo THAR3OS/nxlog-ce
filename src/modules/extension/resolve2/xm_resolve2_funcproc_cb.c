@@ -84,12 +84,15 @@ void nx_expr_func__xm_resolve2_ipaddr_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSE
   ASSERT(retval != NULL);
   ASSERT(num_arg == 1);
 
-  if ( (args[0].type != NX_VALUE_TYPE_STRING) ||
-      (args[0].type != NX_VALUE_TYPE_IP4ADDR) ||
+  if ( (args[0].type != NX_VALUE_TYPE_STRING) &&
+      (args[0].type != NX_VALUE_TYPE_IP4ADDR) &&
       (args[0].type != NX_VALUE_TYPE_IP6ADDR) )
   {
-    throw_msg("'%s' type argument is invalid",
-        nx_value_type_to_string(args[0].type));
+    throw_msg("'%s' type argument is invalid. allowed types are '%s', '%s' and '%s'.",
+        nx_value_type_to_string(args[0].type),
+        nx_value_type_to_string(NX_VALUE_TYPE_STRING),
+        nx_value_type_to_string(NX_VALUE_TYPE_IP4ADDR),
+        nx_value_type_to_string(NX_VALUE_TYPE_IP6ADDR));
   }
 
   retval->type = NX_VALUE_TYPE_STRING;
@@ -108,8 +111,15 @@ void nx_expr_func__xm_resolve2_ipaddr_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSE
     case NX_VALUE_TYPE_IP6ADDR:
       ipaddr = nx_value_to_string(&args[0]);
       break;
+    default:
+      ipaddr = NULL;
   }
 
+  if ( ipaddr == NULL )
+  {
+    retval->defined = FALSE;
+    return;
+  }
   if ((hostname = get_hostname_by_addr(ipaddr)) != NULL)
   {
     retval->string = nx_string_create(hostname, -1);
