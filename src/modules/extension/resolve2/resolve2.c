@@ -1,8 +1,11 @@
 /*
- * This file is part of the nxlog log collector tool.
+ * xm_resolve2
+ *
+ * This file is NOT part of the nxlog log collector tool.
  * See the file LICENSE in the source root for licensing terms.
- * Website: http://nxlog.org
- * Author: Botond Botyanszki <botond.botyanszki@nxlog.org>
+ *
+ * Work on this module has been inspired by the documentation of the NXLog's Enterprise Module xm_resolver
+ * Author: 2019 Stephan Seitz <s.seitz@mailbox.org>
  */
 
 #include <string.h>

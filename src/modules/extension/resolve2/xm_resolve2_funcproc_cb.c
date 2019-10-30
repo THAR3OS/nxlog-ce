@@ -1,9 +1,11 @@
 /*
- * This file is part of the nxlog third-party extension
- * xm_resolve2.
- * License: GNU GPLv2
- * Website: http://github.com/BN4OSS
- * Author: Stephan Seitz <s.seitz@mailbox.org>
+ * xm_resolve2
+ *
+ * This file is NOT part of the nxlog log collector tool.
+ * See the file LICENSE in the source root for licensing terms.
+ *
+ * Work on this module has been inspired by the documentation of the NXLog's Enterprise Module xm_resolver
+ * Author: 2019 Stephan Seitz <s.seitz@mailbox.org>
  */
 
 #include <stdlib.h>
