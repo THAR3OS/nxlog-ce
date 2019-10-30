@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <grp.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -54,11 +56,11 @@ char *_get_hostname_by_addr(char *address)
   } else {
     for (resorig = res; res != NULL; res = res->ai_next)
     {
-      if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
+      if ((error = getnameinfo(resorig->ai_addr, resorig->ai_addrlen,
               numhost, sizeof (numhost), NULL, 0, NI_NUMERICHOST)) != 0)
       {
         throw_msg("getnameinfo: '%s'", gai_strerror(error));
-      } else if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
+      } else if ((error = getnameinfo(resorig->ai_addr, resorig->ai_addrlen,
           host, sizeof (host), NULL, 0, 0)) != 0)
       {
         throw_msg("getnameinfo: '%s'", gai_strerror(error));
@@ -78,8 +80,9 @@ char *_get_ipaddr_by_addr(char *address)
 	int error;
 	struct addrinfo *res, *resorig, hints;
   struct sockaddr_in *addr;
-  struct *ipstring;
-  int endloop;
+  struct sockaddr_in6 *addr6;
+  char *ipstring;
+  unsigned char buf[sizeof(struct in6_addr)];
 
 	memset(&hints, 0, sizeof (hints));
 	hints.ai_family = AF_UNSPEC;
@@ -88,15 +91,23 @@ char *_get_ipaddr_by_addr(char *address)
 
   if ((error = getaddrinfo(address, NULL, &hints, &res)) != 0)
   {
-     throw_msg("getaddrinfo: '%s'", gai_strerror(error));
+    throw_msg("getaddrinfo: '%s'", gai_strerror(error));
   } else {
     for (resorig = res; res != NULL; res = res->ai_next)
     {
       switch (res->ai_family) {
         case AF_INET:
+          addr = (struct sockaddr_in *)resorig->ai_addr;
+          ipstring = inet_ntoa((struct in_addr)addr->sin_addr);
+          freeaddrinfo(resorig);
+          return ipstring;
         case AF_INET6:
-          addr = (struct sockaddr_in)res->ai_addr;
-          ipstring = inet_ntoa((struct in_addr)addr->sin_addr));
+          if ( (addr6 = (struct sockaddr_in6 *)resorig->ai_addr ) != NULL)
+          {
+            memcpy(buf, addr6->sin6_addr.s6_addr, sizeof(addr6->sin6_addr.s6_addr));
+            ipstring = malloc(INET6_ADDRSTRLEN);
+            inet_ntop(AF_INET6, buf, ipstring, INET6_ADDRSTRLEN);
+          }
           freeaddrinfo(resorig);
           return ipstring;
         default:
@@ -245,6 +256,7 @@ void nx_expr_func__xm_resolve2_ipaddr_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSE
   if ((hostname = _get_hostname_by_addr(ipaddr)) != NULL)
   {
     retval->string = nx_string_create(hostname, -1);
+    free(hostname);
   } else {
     retval->string = nx_string_create(ipaddr, -1);
   }
@@ -287,8 +299,135 @@ void nx_expr_func__xm_resolve2_name_to_ipaddr(nx_expr_eval_ctx_t *eval_ctx UNUSE
   if ((ipaddr = _get_ipaddr_by_addr(hostname)) != NULL)
   {
     retval->string = nx_string_create(ipaddr, -1);
+    free(ipaddr);
     retval->defined = TRUE;
   } else {
     retval->defined = FALSE;
   }
 }
+
+void nx_expr_func__xm_resolve2_uid_to_name(nx_expr_eval_ctx_t *eval_ctx UNUSED,
+    nx_module_t *module UNUSED,
+    nx_value_t *retval,
+    int32_t num_arg,
+    nx_value_t *args)
+{
+  uid_t uid;
+  struct passwd* u;
+
+  ASSERT(retval != NULL);
+  ASSERT(num_arg == 1);
+
+  if ( (args[0].type != NX_VALUE_TYPE_STRING) &&
+      (args[0].type != NX_VALUE_TYPE_INTEGER) )
+  {
+    throw_msg("'%s' type argument is invalid. allowed types are '%s' and '%s'.",
+        nx_value_type_to_string(args[0].type),
+        nx_value_type_to_string(NX_VALUE_TYPE_STRING),
+        nx_value_type_to_string(NX_VALUE_TYPE_INTEGER));
+  }
+
+  retval->type = NX_VALUE_TYPE_STRING;
+  if ( args[0].defined == FALSE )
+  {
+    retval->defined = FALSE;
+    return;
+  }
+
+  switch (args[0].type)
+  {
+    case NX_VALUE_TYPE_STRING:
+      uid = (uid_t)atoi(args[0].string->buf);
+      break;
+    case NX_VALUE_TYPE_INTEGER:
+      uid = (uid_t)atoi(nx_value_to_string(&args[0]));
+      break;
+    default:
+      retval->defined = FALSE;
+      return;
+  }
+  if( ( u = getpwuid( uid ) ) == NULL )
+  {
+    retval->defined = FALSE;
+    return;
+     }
+  retval->string = nx_string_create(u->pw_name, -1);
+  retval->defined = TRUE;
+}
+
+void nx_expr_func__xm_resolve2_user_get_gid(nx_expr_eval_ctx_t *eval_ctx UNUSED,
+    nx_module_t *module UNUSED,
+    nx_value_t *retval,
+    int32_t num_arg,
+    nx_value_t *args)
+{
+  char *username;
+  uid_t uid;
+  struct passwd* u;
+
+  ASSERT(retval != NULL);
+  ASSERT(num_arg == 1);
+
+  if ( (args[0].type != NX_VALUE_TYPE_STRING) &&
+      (args[0].type != NX_VALUE_TYPE_INTEGER) )
+  {
+    throw_msg("'%s' type argument is invalid. allowed type is '%s'.",
+        nx_value_type_to_string(args[0].type),
+        nx_value_type_to_string(NX_VALUE_TYPE_STRING));
+  }
+
+  retval->type = NX_VALUE_TYPE_STRING;
+  if ( args[0].defined == FALSE )
+  {
+    retval->defined = FALSE;
+    return;
+  }
+
+  username = args[0].string->buf);
+  if( ( u = getpwnam( username ) ) == NULL )
+  {
+    retval->defined = FALSE;
+    return;
+     }
+  retval->string = nx_string_create(u->pw_gid, -1);
+  retval->defined = TRUE;
+}
+
+void nx_expr_func__xm_resolve2_user_get_uid(nx_expr_eval_ctx_t *eval_ctx UNUSED,
+    nx_module_t *module UNUSED,
+    nx_value_t *retval,
+    int32_t num_arg,
+    nx_value_t *args)
+{
+  char *username;
+  uid_t uid;
+  struct passwd* u;
+
+  ASSERT(retval != NULL);
+  ASSERT(num_arg == 1);
+
+  if ( (args[0].type != NX_VALUE_TYPE_STRING) &&
+      (args[0].type != NX_VALUE_TYPE_INTEGER) )
+  {
+    throw_msg("'%s' type argument is invalid. allowed type is '%s'.",
+        nx_value_type_to_string(args[0].type),
+        nx_value_type_to_string(NX_VALUE_TYPE_STRING));
+  }
+
+  retval->type = NX_VALUE_TYPE_STRING;
+  if ( args[0].defined == FALSE )
+  {
+    retval->defined = FALSE;
+    return;
+  }
+
+  username = args[0].string->buf);
+  if( ( u = getpwnam( username ) ) == NULL )
+  {
+    retval->defined = FALSE;
+    return;
+     }
+  retval->string = nx_string_create(u->pw_uid, -1);
+  retval->defined = TRUE;
+}
+
