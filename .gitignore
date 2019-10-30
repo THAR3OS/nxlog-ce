@@ -1,3 +1,3 @@
-autom4te.cache/**
+/autom4te.cache/*
 svn_version.txt
 
