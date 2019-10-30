@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <sys/types.h>
+#include <pwd.h>
 #include <grp.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -364,7 +365,6 @@ void nx_expr_func__xm_resolve2_user_get_gid(nx_expr_eval_ctx_t *eval_ctx UNUSED,
     nx_value_t *args)
 {
   char *username;
-  uid_t uid;
   struct passwd* u;
 
   ASSERT(retval != NULL);
@@ -385,13 +385,13 @@ void nx_expr_func__xm_resolve2_user_get_gid(nx_expr_eval_ctx_t *eval_ctx UNUSED,
     return;
   }
 
-  username = args[0].string->buf);
+  username = args[0].string->buf;
   if( ( u = getpwnam( username ) ) == NULL )
   {
     retval->defined = FALSE;
     return;
      }
-  retval->string = nx_string_create(u->pw_gid, -1);
+  retval->integer = (uint64_t)u->pw_gid;
   retval->defined = TRUE;
 }
 
@@ -402,7 +402,6 @@ void nx_expr_func__xm_resolve2_user_get_uid(nx_expr_eval_ctx_t *eval_ctx UNUSED,
     nx_value_t *args)
 {
   char *username;
-  uid_t uid;
   struct passwd* u;
 
   ASSERT(retval != NULL);
@@ -423,13 +422,13 @@ void nx_expr_func__xm_resolve2_user_get_uid(nx_expr_eval_ctx_t *eval_ctx UNUSED,
     return;
   }
 
-  username = args[0].string->buf);
+  username = args[0].string->buf;
   if( ( u = getpwnam( username ) ) == NULL )
   {
     retval->defined = FALSE;
     return;
      }
-  retval->string = nx_string_create(u->pw_uid, -1);
+  retval->integer = (uint64_t)u->pw_uid;
   retval->defined = TRUE;
 }
 
