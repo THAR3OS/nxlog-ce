@@ -3,13 +3,18 @@
 This fork is used for developing additional modules.
 
 **To build this project, use:**
-```./autogen.sh
+
+```bash
+./autogen.sh
 make  
-sudo make install```
+sudo make install
+```
 
 **Before commiting / merging into master:**
 
-```make distclean```
+```bash
+make distclean
+```
 
 ## Modules added:
 ### xm_resolve2
