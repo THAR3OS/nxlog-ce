@@ -1,0 +1,95 @@
+[[xm_resolve2_funcs]]
+===== Functions
+
+The following functions are exported by _xm_resolve2_.
+
+[[xm_resolve2_func_gid_to_name]]
+<<lang_type_string,string>> `gid_to_name(<<lang_type_integer,integer>> gid)`::
++
+--
+
+Return the group name assigned to the group ID. If gid cannot
+be looked up, undef is returned.
+     
+--
+
+<<lang_type_string,string>> `gid_to_name(<<lang_type_string,string>> gid)`::
++
+--
+
+Return the group name assigned to the string gid on Unix. If
+gid cannot be looked up, undef is returned.
+     
+--
+
+[[xm_resolve2_func_group_get_gid]]
+<<lang_type_integer,integer>> `group_get_gid(<<lang_type_string,string>> groupname)`::
++
+--
+
+Return the group ID assigned to the group name.
+     
+--
+
+[[xm_resolve2_func_ipaddr_to_name]]
+<<lang_type_string,string>> `ipaddr_to_name(<<lang_type_string,string>> ipaddr)`::
++
+--
+
+Resolve and return the DNS name assigned to the IP address. The
+ipaddr argument can be either a string or an ip4addr type.
+     
+--
+
+[[xm_resolve2_func_name_to_ipaddr]]
+<<lang_type_string,string>> `name_to_ipaddr(<<lang_type_string,string>> name)`::
++
+--
+
+Resolve and return the first IPv4 or IPv6 address assigned to name.
+Here, xm_resolve2 differs from xm_resolver. Despite returing an
+ip4addr xm_resolve2 returns a string. Casting to ip4addr/ip6addr
+needs to be done in nxlog config language.
+     
+--
+
+[[xm_resolve2_func_uid_to_name]]
+<<lang_type_string,string>> `uid_to_name(<<lang_type_integer,integer>> uid)`::
++
+--
+
+Return the username corresponding to the user ID. If uid cannot
+be looked up, undef is returned.
+     
+--
+
+<<lang_type_string,string>> `uid_to_name(<<lang_type_string,string>> uid)`::
++
+--
+
+Return the username corresponding to the user ID or SID. This function
+takes a string which is normally a SID on Windows or an integer UID on Unix.
+Despite the xm_resolver, xm_resolve2 does not return DOMAIN/USER on Windows.
+If uid cannot be looked up, undef is returned.
+     
+--
+
+[[xm_resolve2_func_user_get_gid]]
+<<lang_type_integer,integer>> `user_get_gid(<<lang_type_string,string>> username)`::
++
+--
+
+Return the user’s primary group ID (the group ID assigned to username).
+     
+--
+
+[[xm_resolve2_func_user_get_uid]]
+<<lang_type_integer,integer>> `user_get_uid(<<lang_type_string,string>> username)`::
++
+--
+
+Return the user ID assigned to username.
+     
+--
+
+
