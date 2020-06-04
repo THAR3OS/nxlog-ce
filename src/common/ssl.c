@@ -399,7 +399,8 @@ SSL *nx_ssl_from_socket(nx_ssl_ctx_t *ctx, apr_socket_t *sock)
 			 ctx->crlfile == NULL ? ctx->crldir : ctx->crlfile);
 	}
     }
-    X509_VERIFY_PARAM_set_flags(ssl_ctx->param, verify_flags);
+    X509_VERIFY_PARAM *param = SSL_CTX_get0_param(ssl_ctx);
+    X509_VERIFY_PARAM_set_flags(param, verify_flags);
 
     if ( ctx->allow_untrusted != TRUE )
     {

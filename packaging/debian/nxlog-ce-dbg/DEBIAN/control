@@ -1,10 +1,10 @@
 Package: nxlog-ce-dbg
 Source: nxlog-ce
-Version: 2.10.7
+Version: 2.10.32
 Architecture: amd64
 Maintainer: Botond Botyanszki <boti@nxlog.org>
-Installed-Size: 11710
-Depends: nxlog-ce (= 2.10.7)
+Installed-Size: 11405
+Depends: nxlog-ce (= 2.10.32)
 Section: debug
 Priority: extra
 Description: Modular, high-performance log management solution (debug symbols)
